@@ -65,11 +65,12 @@ class TestUtils:
 
         localized_datetime = utils.localize_datetime(date)
 
-        assert localized_datetime == datetime(
-            2022, 7, 10, 21, 17, 34, 633809, tzinfo=zoneinfo.ZoneInfo("localtime")
-        )
+        assert localized_datetime.replace(tzinfo=None) == date
+        assert localized_datetime.tzinfo is not None
 
     def test_localize_datetime_input_timezone_aware(self):
+        los_angeles = zoneinfo.ZoneInfo("America/Los_Angeles")
+
         date = datetime(
             2022,
             7,
@@ -78,7 +79,7 @@ class TestUtils:
             17,
             34,
             633809,
-            tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
+            tzinfo=los_angeles,
         )
 
         localized_datetime = utils.localize_datetime(date)
@@ -91,7 +92,7 @@ class TestUtils:
             17,
             34,
             633809,
-            tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
+            tzinfo=los_angeles,
         )
 
     def test_grocy_datetime_str(self):

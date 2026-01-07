@@ -809,8 +809,10 @@ class GrocyApiClient(object):
         return self._do_delete_request(f"objects/{entity_type}/{object_id}")
 
     def get_generic_objects_for_type(
-        self, entity_type: str, query_filters: list[str] | None = None
+        self, entity_type: str | Enum, query_filters: list[str] | None = None
     ):
+        if isinstance(entity_type, Enum):
+            entity_type = entity_type.value
         return self._do_get_request(f"objects/{entity_type}", query_filters)
 
     def get_meal_plan_sections(

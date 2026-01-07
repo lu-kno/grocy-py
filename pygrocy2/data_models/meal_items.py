@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 
 from pygrocy2.base import DataModel
@@ -85,7 +85,7 @@ class MealPlanItemType(str, Enum):
 class MealPlanItem(DataModel):
     def __init__(self, response: MealPlanResponse):
         self._id = response.id
-        self._day = response.day
+        self._day = self._normalize_day(response.day)
         self._recipe = None
         self._recipe_id = response.recipe_id
         self._recipe_servings = response.recipe_servings
@@ -99,7 +99,7 @@ class MealPlanItem(DataModel):
         return self._id
 
     @property
-    def day(self) -> datetime.date:
+    def day(self) -> date | None:
         return self._day
 
     @property
@@ -143,3 +143,14 @@ class MealPlanItem(DataModel):
             section = api_client.get_meal_plan_section(self.section_id)
             if section:
                 self._section = MealPlanSection(section)
+
+    @staticmethod
+    def _normalize_day(value) -> date | None:
+        if value is None:
+            return None
+        if isinstance(value, date) and not isinstance(value, datetime):
+            return value
+        if isinstance(value, datetime):
+            return value.date()
+        # Grocy sometimes returns ISO8601 strings in this field.
+        return datetime.fromisoformat(str(value)).date()

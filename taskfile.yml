@@ -1,0 +1,45 @@
+version: '3'
+
+dotenv:
+  - .task.env
+
+tasks:
+  install:
+    desc: Install project with development tooling
+    cmds:
+      - python -m pip install -r requirements.txt
+      - python -m pip install -r requirements-dev.txt
+      - python -m pip install -e .
+      - python -m pip install build twine ruff
+      - pre-commit install
+
+  deps:
+    desc: Install runtime dependencies
+    cmds:
+      - python -m pip install -r requirements.txt
+
+  test:
+    desc: Run the full test suite
+    cmds:
+      - pytest
+
+  lint:
+    desc: Lint with Ruff
+    cmds:
+      - ruff check .
+
+  format:
+    desc: Format code with Ruff and apply fixes
+    cmds:
+      - ruff check . --fix
+      - ruff format .
+
+  publish:
+    desc: Build and publish the package to PyPI
+    env:
+      TWINE_USERNAME: "{{.PYPI_USERNAME}}"
+      TWINE_PASSWORD: "{{.PYPI_TOKEN}}"
+    cmds:
+      - rm -rf dist build
+      - python -m build
+      - twine upload dist/*

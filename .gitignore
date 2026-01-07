@@ -95,8 +95,9 @@ venv/
 __pycache__
 html/
 build/
-pygrocy.egg-info/
-
+pygrocy2.egg-info/
+dist/
 
 .tox/
 .coverage
+.task.env

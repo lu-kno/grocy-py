@@ -1,26 +1,10 @@
-import setuptools
+"""Legacy setuptools fallback.
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+The project uses pyproject.toml for metadata and builds.
+"""
 
-setuptools.setup(
-    name="pygrocy2",
-    version="2.5.0",
-    author="Flipper",
-    description="",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/flipper/pygrocy2",
-    license="MIT",
-    packages=setuptools.find_packages(),
-    install_requires=[
-        "requests",
-        "deprecation~=2.1.0",
-        "pydantic~=2.12.2",
-    ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-)
+from setuptools import setup
+
+
+if __name__ == "__main__":  # pragma: no cover - compatibility shim only
+    setup()

@@ -6,7 +6,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        exclude: ^test/cassettes/
+        exclude: ^(test/cassettes).*$
       - id: check-json
       - id: check-merge-conflict
 

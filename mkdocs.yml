@@ -1,0 +1,76 @@
+site_name: pygrocy2
+site_description: Python client for the Grocy inventory management API
+site_url: https://iamkarlson.github.io/pygrocy2/
+repo_url: https://github.com/iamkarlson/pygrocy2
+repo_name: iamkarlson/pygrocy2
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_bases: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            docstring_style: google
+            merge_init_into_class: true
+            show_if_no_docstring: true
+            heading_level: 3
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API Reference:
+      - Grocy Client: reference/grocy.md
+      - Data Models:
+          - Product: reference/models/product.md
+          - Chore: reference/models/chore.md
+          - Task: reference/models/task.md
+          - Battery: reference/models/battery.md
+          - Equipment: reference/models/equipment.md
+          - Meal Plan: reference/models/meal_plan.md
+          - User: reference/models/user.md
+          - System: reference/models/system.md
+      - API Response Types: reference/api-responses.md
+      - Enums: reference/enums.md
+      - Errors: reference/errors.md

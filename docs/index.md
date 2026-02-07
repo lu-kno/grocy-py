@@ -1,0 +1,60 @@
+# pygrocy2
+
+A Python client library for the [Grocy](https://grocy.info/) ERP system API.
+
+pygrocy2 provides a clean, typed Python interface to manage your household inventory — products, stock, shopping lists, chores, tasks, batteries, equipment, meal plans, and more.
+
+## Quick Example
+
+```python
+from pygrocy2 import Grocy
+
+grocy = Grocy("https://your-grocy-instance.com", "YOUR_API_KEY")
+
+# Get current stock
+for product in grocy.stock():
+    print(f"{product.name}: {product.available_amount} in stock")
+
+# Get overdue products
+for product in grocy.overdue_products():
+    print(f"{product.name} is overdue!")
+
+# Manage shopping list
+shopping_list = grocy.shopping_list(get_details=True)
+for item in shopping_list:
+    print(f"{item.product.name}: {item.amount}")
+```
+
+## Features
+
+- **Stock management** — query, add, consume, open, and inventory products
+- **Shopping lists** — view, add/remove products, clear lists
+- **Chores** — list, track, and execute chores
+- **Tasks** — manage and complete tasks
+- **Batteries** — track battery charge cycles
+- **Equipment** — manage household equipment
+- **Meal plans** — view and manage meal plans and recipes
+- **Users** — query user accounts
+- **System** — get server info, time, and configuration
+- **Generic CRUD** — create, read, update, delete any Grocy entity type
+
+## Architecture Overview
+
+```
+pygrocy2
+├── Grocy              # High-level client (you use this)
+├── GrocyApiClient     # Low-level HTTP API wrapper
+├── Data Models        # Rich domain objects (Product, Chore, Task, ...)
+├── API Responses      # Pydantic models for raw API responses
+├── Enums              # EntityType, TransactionType, etc.
+└── Errors             # GrocyError exception
+```
+
+| Layer | Purpose |
+|---|---|
+| [`Grocy`](reference/grocy.md) | Main entry point. Methods return rich data model objects. |
+| [`GrocyApiClient`](reference/api-responses.md) | Handles HTTP requests/responses. Returns Pydantic response models. |
+| [Data Models](reference/models/product.md) | Domain classes like `Product`, `Chore`, `Task` with properties. |
+| [API Responses](reference/api-responses.md) | Pydantic `BaseModel` classes for JSON deserialization. |
+| [Enums](reference/enums.md) | `EntityType`, `TransactionType`, `PeriodType`, etc. |
+| [Errors](reference/errors.md) | `GrocyError` raised on HTTP 4xx/5xx responses. |

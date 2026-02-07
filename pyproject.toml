@@ -32,6 +32,10 @@ dev = [
     "pytest-mock",
     "urllib3==2.2.3",
 ]
+docs = [
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
 
 [tool.uv]
 package = true

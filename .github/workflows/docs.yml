@@ -25,18 +25,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Install dependencies
         run: |
-          pip install pdoc
-          pip install -e .
+          uv sync --group docs
+          uv pip install -e .
 
       - name: Build docs
-        run: pdoc pygrocy2 -o docs/
+        run: uv run mkdocs build -d site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/
+          path: site/
 
   deploy:
     environment:

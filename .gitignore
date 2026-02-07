@@ -102,3 +102,4 @@ dist/
 .coverage
 *.env
 site/
+.grocy-data/

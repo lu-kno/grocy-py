@@ -2,12 +2,12 @@ import datetime
 
 import pytest
 
-from pygrocy2.data_models.meal_items import (
+from pygrocy.data_models.meal_items import (
     MealPlanItemType,
     MealPlanSection,
     RecipeItem,
 )
-from pygrocy2.errors import GrocyError
+from pygrocy.errors import GrocyError
 
 
 class TestMealPlan:

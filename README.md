@@ -1,16 +1,16 @@
-# pygrocy2
-Check out [source code reference docs](https://iamkarlson.github.io/pygrocy2/)
+# grocy-py
+Check out [source code reference docs](https://iamkarlson.github.io/grocy-py/)
 
 ## Installation
 
-`pip install pygrocy2`
+`pip install grocy-py`
 
 ## Usage
 
 Import the package:
 
 ```python
-from pygrocy2 import Grocy
+from pygrocy import Grocy
 ```
 
 Obtain a grocy instance:
@@ -34,8 +34,8 @@ for entry in grocy.stock():
 
 # Support
 
-If you need help using pygrocy check the [discussions](https://github.com/flipper/pygrocy2/issues) section. Feel free to create an issue for feature requests, bugs and errors in the library.
+If you need help using grocy-py check the [discussions](https://github.com/iamkarlson/grocy-py/issues) section. Feel free to create an issue for feature requests, bugs and errors in the library.
 
 ## Development testing
 
-You need tox and Python 3.13 to run the tests. Navigate to the root dir of `pygrocy2` and execute `tox` to run the tests.
+You need tox and Python 3.13 to run the tests. Navigate to the root dir of `grocy-py` and execute `tox` to run the tests.

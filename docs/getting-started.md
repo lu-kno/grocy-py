@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-pip install pygrocy2
+pip install grocy-py
 ```
 
 ## Requirements
@@ -14,7 +14,7 @@ pip install pygrocy2
 ## Connecting to Grocy
 
 ```python
-from pygrocy2 import Grocy
+from pygrocy import Grocy
 
 # Basic connection
 grocy = Grocy("https://your-grocy-instance.com", "YOUR_API_KEY")
@@ -48,7 +48,7 @@ known API key (`test_local_devenv`) into the demo database.
 **Connect to it:**
 
 ```python
-from pygrocy2 import Grocy
+from pygrocy import Grocy
 
 grocy = Grocy("http://localhost", "test_local_devenv", port=9192)
 
@@ -161,8 +161,8 @@ print(f"{recipe.name} ({recipe.base_servings} servings)")
 For any Grocy entity type, you can use the generic CRUD methods:
 
 ```python
-from pygrocy2 import Grocy
-from pygrocy2.data_models.generic import EntityType
+from pygrocy import Grocy
+from pygrocy.data_models.generic import EntityType
 
 grocy = Grocy("https://example.com", "API_KEY")
 
@@ -200,7 +200,7 @@ for product in due:
 ## Error Handling
 
 ```python
-from pygrocy2.errors import GrocyError
+from pygrocy.errors import GrocyError
 
 try:
     grocy.product(product_id=99999)

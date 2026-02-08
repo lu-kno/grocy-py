@@ -5,14 +5,14 @@ The `Grocy` class is the main entry point for the library. It wraps the low-leve
 ## Usage
 
 ```python
-from pygrocy2 import Grocy
+from pygrocy import Grocy
 
 grocy = Grocy("https://your-grocy-instance.com", "YOUR_API_KEY")
 ```
 
 ## Class Reference
 
-::: pygrocy2.grocy.Grocy
+::: pygrocy.grocy.Grocy
     options:
       members_order: source
       show_source: false

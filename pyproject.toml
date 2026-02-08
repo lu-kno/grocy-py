@@ -3,8 +3,8 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pygrocy2"
-version = "2.7.1"
+name = "grocy-py"
+version = "0.0.1"
 readme = "README.md"
 authors = [
     { name = "George Green", email = "iamkarlson@gmail.com" }]
@@ -19,7 +19,7 @@ dependencies = [
 license =  "MIT"
 
 [project.urls]
-Homepage = "https://github.com/iamkarlson/pygrocy2"
+Homepage = "https://github.com/iamkarlson/grocy-py"
 [dependency-groups]
 dev = [
     "responses~=0.21.0",
@@ -39,7 +39,7 @@ docs = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["pygrocy2*"]
+include = ["pygrocy*"]
 
 [tool.uv]
 package = true

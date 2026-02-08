@@ -1,13 +1,13 @@
-# pygrocy2
+# grocy-py
 
 A Python client library for the [Grocy](https://grocy.info/) ERP system API.
 
-pygrocy2 provides a clean, typed Python interface to manage your household inventory — products, stock, shopping lists, chores, tasks, batteries, equipment, meal plans, and more.
+grocy-py provides a clean, typed Python interface to manage your household inventory — products, stock, shopping lists, chores, tasks, batteries, equipment, meal plans, and more.
 
 ## Quick Example
 
 ```python
-from pygrocy2 import Grocy
+from pygrocy import Grocy
 
 grocy = Grocy("https://your-grocy-instance.com", "YOUR_API_KEY")
 
@@ -41,7 +41,7 @@ for item in shopping_list:
 ## Architecture Overview
 
 ```
-pygrocy2
+grocy-py
 ├── Grocy              # High-level client (you use this)
 ├── GrocyApiClient     # Low-level HTTP API wrapper
 ├── Data Models        # Rich domain objects (Product, Chore, Task, ...)

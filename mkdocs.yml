@@ -1,8 +1,8 @@
-site_name: pygrocy2
+site_name: grocy-py
 site_description: Python client for the Grocy inventory management API
-site_url: https://iamkarlson.github.io/pygrocy2/
-repo_url: https://github.com/iamkarlson/pygrocy2
-repo_name: iamkarlson/pygrocy2
+site_url: https://iamkarlson.github.io/grocy-py/
+repo_url: https://github.com/iamkarlson/grocy-py
+repo_name: iamkarlson/grocy-py
 
 theme:
   name: material

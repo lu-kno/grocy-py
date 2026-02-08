@@ -31,6 +31,8 @@ def _none_if_empty_str(value: Any):
 
 
 class ShoppingListItem(BaseModel):
+    """API response model for a shopping list item."""
+
     id: int
     product_id: int | None = None
     note: str | None = None
@@ -41,6 +43,8 @@ class ShoppingListItem(BaseModel):
 
 
 class MealPlanResponse(BaseModel):
+    """API response model for a meal plan entry."""
+
     id: int
     day: datetime
     type: str
@@ -56,6 +60,8 @@ class MealPlanResponse(BaseModel):
 
 
 class RecipeDetailsResponse(BaseModel):
+    """API response model for recipe details."""
+
     id: int | None = None
     name: str
     description: str | None = None
@@ -67,6 +73,8 @@ class RecipeDetailsResponse(BaseModel):
 
 
 class QuantityUnitData(BaseModel):
+    """API response model for a quantity unit."""
+
     id: int
     name: str
     name_plural: str | None = None
@@ -75,6 +83,8 @@ class QuantityUnitData(BaseModel):
 
 
 class LocationData(BaseModel):
+    """API response model for a location."""
+
     id: int
     name: str
     description: str | None = None
@@ -82,6 +92,8 @@ class LocationData(BaseModel):
 
 
 class ProductData(BaseModel):
+    """API response model for a product entity."""
+
     id: int
     name: str
     description: str | None = None
@@ -100,6 +112,8 @@ class ProductData(BaseModel):
 
 
 class ChoreData(BaseModel):
+    """API response model for a chore entity."""
+
     id: int
     name: str
     description: str | None = None
@@ -119,6 +133,8 @@ class ChoreData(BaseModel):
 
 
 class UserDto(BaseModel):
+    """API response model for a user."""
+
     id: int
     username: str
     first_name: str | None = None
@@ -127,12 +143,16 @@ class UserDto(BaseModel):
 
 
 class CurrentChoreResponse(BaseModel):
+    """API response model for a current chore summary."""
+
     chore_id: int
     last_tracked_time: datetime | None = None
     next_estimated_execution_time: datetime | None = None
 
 
 class CurrentStockResponse(BaseModel):
+    """API response model for a product's current stock."""
+
     product_id: int
     amount: float
     best_before_date: datetime
@@ -144,6 +164,8 @@ class CurrentStockResponse(BaseModel):
 
 
 class MissingProductResponse(BaseModel):
+    """API response model for a missing product."""
+
     id: int
     name: str
     amount_missing: float
@@ -151,6 +173,8 @@ class MissingProductResponse(BaseModel):
 
 
 class CurrentVolatileStockResponse(BaseModel):
+    """API response model for volatile stock (due, overdue, expired, missing)."""
+
     due_products: list[CurrentStockResponse] | None = None
     overdue_products: list[CurrentStockResponse] | None = None
     expired_products: list[CurrentStockResponse] | None = None
@@ -158,11 +182,15 @@ class CurrentVolatileStockResponse(BaseModel):
 
 
 class ProductBarcodeData(BaseModel):
+    """API response model for a product barcode."""
+
     barcode: str
     amount: float | None = None
 
 
 class ProductDetailsResponse(BaseModel):
+    """API response model for full product details."""
+
     last_purchased: datetime | None = None
     last_used: datetime | None = None
     stock_amount: float
@@ -177,6 +205,8 @@ class ProductDetailsResponse(BaseModel):
 
 
 class ChoreDetailsResponse(BaseModel):
+    """API response model for full chore details."""
+
     chore: ChoreData
     last_tracked: datetime | None = None
     next_estimated_execution_time: datetime | None = None
@@ -186,6 +216,8 @@ class ChoreDetailsResponse(BaseModel):
 
 
 class TransactionType(Enum):
+    """Stock transaction types."""
+
     PURCHASE = "purchase"
     CONSUME = "consume"
     INVENTORY_CORRECTION = "inventory-correction"
@@ -193,6 +225,8 @@ class TransactionType(Enum):
 
 
 class TaskCategoryDto(BaseModel):
+    """API response model for a task category."""
+
     id: int
     name: str
     description: str | None = None
@@ -200,6 +234,8 @@ class TaskCategoryDto(BaseModel):
 
 
 class TaskResponse(BaseModel):
+    """API response model for a task."""
+
     id: int
     name: str
     description: str | None = None
@@ -218,12 +254,16 @@ class TaskResponse(BaseModel):
 
 
 class CurrentBatteryResponse(BaseModel):
+    """API response model for a current battery summary."""
+
     id: int
     last_tracked_time: datetime | None = None
     next_estimated_charge_time: datetime | None = None
 
 
 class BatteryData(BaseModel):
+    """API response model for a battery entity."""
+
     id: int
     name: str
     description: str | None = None
@@ -234,6 +274,8 @@ class BatteryData(BaseModel):
 
 
 class BatteryDetailsResponse(BaseModel):
+    """API response model for full battery details."""
+
     battery: BatteryData
     charge_cycles_count: int
     last_charged: datetime | None = None
@@ -242,6 +284,8 @@ class BatteryDetailsResponse(BaseModel):
 
 
 class EquipmentData(BaseModel):
+    """API response model for an equipment entity."""
+
     id: int
     name: str
     description: str | None = None
@@ -251,10 +295,14 @@ class EquipmentData(BaseModel):
 
 
 class EquipmentDetailsResponse(BaseModel):
+    """API response model for equipment details."""
+
     equipment: EquipmentData
 
 
 class MealPlanSectionResponse(BaseModel):
+    """API response model for a meal plan section."""
+
     id: int | None = None
     name: str | None = None
     sort_number: int | None = None
@@ -264,6 +312,8 @@ class MealPlanSectionResponse(BaseModel):
 
 
 class StockLogResponse(BaseModel):
+    """API response model for a stock transaction log entry."""
+
     id: int
     product_id: int
     amount: float
@@ -277,11 +327,15 @@ class StockLogResponse(BaseModel):
 
 
 class GrocyVersionDto(BaseModel):
+    """API response model for Grocy version information."""
+
     version: str = Field(alias="Version")
     release_date: datetime = Field(alias="ReleaseDate")
 
 
 class SystemInfoDto(BaseModel):
+    """API response model for system information."""
+
     grocy_version_info: GrocyVersionDto = Field(alias="grocy_version")
     php_version: str
     sqlite_version: str
@@ -290,6 +344,8 @@ class SystemInfoDto(BaseModel):
 
 
 class SystemTimeDto(BaseModel):
+    """API response model for server time."""
+
     timezone: str
     time_local: datetime
     time_local_sqlite3: datetime
@@ -298,6 +354,8 @@ class SystemTimeDto(BaseModel):
 
 
 class SystemConfigDto(BaseModel, extra="allow"):
+    """API response model for system configuration."""
+
     username: str = Field(alias="USER_USERNAME")
     base_path: str = Field(alias="BASE_PATH")
     base_url: str = Field(alias="BASE_URL")
@@ -326,6 +384,8 @@ class SystemConfigDto(BaseModel, extra="allow"):
 
 
 class StockEntryResponse(BaseModel):
+    """API response model for a stock entry."""
+
     id: int
     product_id: int
     amount: float
@@ -340,18 +400,24 @@ class StockEntryResponse(BaseModel):
 
 
 class StockLocationResponse(BaseModel):
+    """API response model for stock at a location."""
+
     product_id: int
     location_id: int
     amount: float
 
 
 class PriceHistoryResponse(BaseModel):
+    """API response model for a price history entry."""
+
     date: datetime
     price: float
     shopping_location_id: int | None = None
 
 
 class RecipeFulfillmentResponse(BaseModel):
+    """API response model for recipe fulfillment status."""
+
     recipe_id: int
     need_fulfilled: bool
     need_fulfilled_with_shopping_list: bool
@@ -359,6 +425,8 @@ class RecipeFulfillmentResponse(BaseModel):
 
 
 class StockBookingResponse(BaseModel):
+    """API response model for a stock booking."""
+
     id: int
     product_id: int
     amount: float
@@ -375,6 +443,11 @@ def _enable_debug_mode():
 
 
 class GrocyApiClient(object):
+    """Low-level HTTP client for the Grocy REST API.
+
+    Used internally by manager classes. Most users should use `Grocy` instead.
+    """
+
     def __init__(
         self,
         base_url,

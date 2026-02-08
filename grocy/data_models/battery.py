@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 
 class Battery(BaseModel):
+    """A tracked battery with charge cycle history."""
+
     id: int
     name: str | None = None
     description: str | None = None
@@ -20,6 +22,7 @@ class Battery(BaseModel):
 
     @classmethod
     def from_current_response(cls, resp) -> Battery:
+        """Create from a current-batteries API response."""
         return cls(
             id=resp.id,
             last_tracked_time=resp.last_tracked_time,
@@ -28,6 +31,7 @@ class Battery(BaseModel):
 
     @classmethod
     def from_details_response(cls, resp) -> Battery:
+        """Create from a battery-details API response."""
         return cls(
             id=resp.battery.id,
             name=resp.battery.name,
@@ -43,6 +47,7 @@ class Battery(BaseModel):
         )
 
     def get_details(self, api_client):
+        """Fetch and populate full battery details from the API."""
         details = api_client.get_battery(self.id)
         if details:
             updated = Battery.from_details_response(details)

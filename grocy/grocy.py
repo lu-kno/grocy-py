@@ -21,6 +21,20 @@ _LOGGER.setLevel(logging.INFO)
 
 
 class Grocy:
+    """Main client for the Grocy ERP API.
+
+    Provides access to domain-specific managers as cached properties.
+    Each manager handles a subset of the Grocy API.
+
+    Args:
+        base_url: Grocy server URL (e.g. ``"https://grocy.example.com"``).
+        api_key: API key for authentication. Use ``"demo_mode"`` for the demo server.
+        port: Server port number.
+        path: Optional URL path prefix (e.g. ``"grocy"`` for ``/grocy/api/``).
+        verify_ssl: Whether to verify SSL certificates.
+        debug: Enable debug logging.
+    """
+
     def __init__(
         self,
         base_url,

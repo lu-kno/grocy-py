@@ -8,6 +8,8 @@ from pydantic import BaseModel
 
 
 class RecipeItem(BaseModel):
+    """A recipe with serving information."""
+
     id: int | None = None
     name: str
     description: str | None = None
@@ -17,6 +19,7 @@ class RecipeItem(BaseModel):
 
     @classmethod
     def from_response(cls, resp) -> RecipeItem:
+        """Create from a recipe API response."""
         return cls(
             id=resp.id,
             name=resp.name,
@@ -27,6 +30,11 @@ class RecipeItem(BaseModel):
         )
 
     def get_picture_url_path(self, width: int = 400):
+        """Build the API URL path for the recipe picture.
+
+        Args:
+            width: Desired image width in pixels.
+        """
         if self.picture_file_name:
             b64name = base64.b64encode(self.picture_file_name.encode("ascii"))
             path = "files/recipepictures/" + str(b64name, "utf-8")
@@ -34,6 +42,8 @@ class RecipeItem(BaseModel):
 
 
 class MealPlanSection(BaseModel):
+    """A named section within the meal plan."""
+
     id: int | None = None
     name: str | None = None
     sort_number: int | None = None
@@ -41,6 +51,7 @@ class MealPlanSection(BaseModel):
 
     @classmethod
     def from_response(cls, resp) -> MealPlanSection:
+        """Create from a meal plan section API response."""
         return cls(
             id=resp.id,
             name=resp.name,
@@ -50,12 +61,16 @@ class MealPlanSection(BaseModel):
 
 
 class MealPlanItemType(str, Enum):
+    """Type of item in a meal plan entry."""
+
     NOTE = "note"
     PRODUCT = "product"
     RECIPE = "recipe"
 
 
 class MealPlanItem(BaseModel):
+    """A single entry in the meal plan."""
+
     id: int
     day: date | None = None
     recipe_id: int | None = None
@@ -69,6 +84,7 @@ class MealPlanItem(BaseModel):
 
     @classmethod
     def from_response(cls, resp) -> MealPlanItem:
+        """Create from a meal plan API response."""
         day = cls._normalize_day(resp.day)
         return cls(
             id=resp.id,
@@ -82,6 +98,7 @@ class MealPlanItem(BaseModel):
         )
 
     def get_details(self, api_client):
+        """Fetch and populate linked recipe and section details from the API."""
         if self.recipe_id:
             recipe = api_client.get_recipe(self.recipe_id)
             if recipe:

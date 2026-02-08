@@ -8,6 +8,8 @@ from .user import User
 
 
 class TaskCategory(BaseModel):
+    """A category for organizing tasks."""
+
     id: int
     name: str
     description: str | None = None
@@ -15,6 +17,8 @@ class TaskCategory(BaseModel):
 
 
 class Task(BaseModel):
+    """A task with optional due date, category, and user assignment."""
+
     id: int
     name: str
     description: str | None = None
@@ -29,6 +33,7 @@ class Task(BaseModel):
 
     @classmethod
     def from_response(cls, resp) -> Task:
+        """Create from a task API response."""
         category = None
         if resp.category:
             category = TaskCategory(

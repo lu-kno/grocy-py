@@ -2,6 +2,13 @@ from requests import Response
 
 
 class GrocyError(Exception):
+    """Exception raised when the Grocy API returns an error response.
+
+    Attributes:
+        status_code: HTTP status code from the response.
+        message: Error message from the API, if available.
+    """
+
     def __init__(self, response: Response):
         self._status_code = response.status_code
 

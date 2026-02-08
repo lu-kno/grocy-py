@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class EntityType(str, Enum):
+    """Grocy entity type identifiers for the generic CRUD API."""
+
     PRODUCTS = "products"
     CHORES = "chores"
     PRODUCT_BARCODES = "product_barcodes"

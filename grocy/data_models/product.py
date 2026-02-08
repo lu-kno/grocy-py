@@ -6,11 +6,15 @@ from pydantic import BaseModel
 
 
 class ProductBarcode(BaseModel):
+    """A barcode associated with a product."""
+
     barcode: str
     amount: float | None = None
 
 
 class QuantityUnit(BaseModel):
+    """A unit of measurement for products."""
+
     id: int
     name: str
     name_plural: str | None = None
@@ -18,6 +22,12 @@ class QuantityUnit(BaseModel):
 
 
 class Product(BaseModel):
+    """A product tracked in Grocy inventory.
+
+    Populated with varying levels of detail depending on the source response.
+    Use ``get_details`` to fetch full information.
+    """
+
     id: int
     name: str | None = None
     product_group_id: int | None = None
@@ -35,6 +45,7 @@ class Product(BaseModel):
 
     @classmethod
     def from_stock_response(cls, resp) -> Product:
+        """Create from a current-stock API response."""
         barcodes_list: list[ProductBarcode] = []
         name = None
         product_group_id = None
@@ -57,6 +68,7 @@ class Product(BaseModel):
 
     @classmethod
     def from_missing_response(cls, resp) -> Product:
+        """Create from a missing-products API response."""
         return cls(
             id=resp.id,
             name=resp.name,
@@ -66,6 +78,7 @@ class Product(BaseModel):
 
     @classmethod
     def from_details_response(cls, resp) -> Product:
+        """Create from a product-details API response."""
         product_barcodes = (
             [ProductBarcode(barcode=b.barcode, amount=b.amount) for b in resp.barcodes]
             if resp.barcodes
@@ -100,6 +113,7 @@ class Product(BaseModel):
 
     @classmethod
     def from_product_data(cls, data) -> Product:
+        """Create from raw product entity data."""
         return cls(
             id=data.id,
             name=data.name,
@@ -108,9 +122,11 @@ class Product(BaseModel):
 
     @classmethod
     def from_stock_log_response(cls, resp) -> Product:
+        """Create a minimal instance from a stock log entry."""
         return cls(id=resp.product_id)
 
     def get_details(self, api_client):
+        """Fetch and populate full product details from the API."""
         details = api_client.get_product(self.id)
         if details:
             updated = Product.from_details_response(details)
@@ -126,12 +142,16 @@ class Product(BaseModel):
 
 
 class Group(BaseModel):
+    """A product group for categorizing products."""
+
     id: int
     name: str
     description: str | None = None
 
 
 class ShoppingListProduct(BaseModel):
+    """An item on a shopping list, optionally linked to a product."""
+
     id: int
     product_id: int | None = None
     amount: float | None = None
@@ -141,6 +161,7 @@ class ShoppingListProduct(BaseModel):
 
     @classmethod
     def from_shopping_list_item(cls, item) -> ShoppingListProduct:
+        """Create from a shopping list API response."""
         return cls(
             id=item.id,
             product_id=item.product_id,
@@ -150,6 +171,7 @@ class ShoppingListProduct(BaseModel):
         )
 
     def get_details(self, api_client):
+        """Fetch and populate the linked product details from the API."""
         if self.product_id:
             resp = api_client.get_product(self.product_id)
             if resp:

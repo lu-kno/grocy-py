@@ -9,6 +9,8 @@ from .user import User
 
 
 class PeriodType(str, Enum):
+    """Chore recurrence period type."""
+
     MANUALLY = "manually"
     DYNAMIC_REGULAR = "dynamic-regular"
     DAILY = "daily"
@@ -20,6 +22,8 @@ class PeriodType(str, Enum):
 
 
 class AssignmentType(str, Enum):
+    """Chore assignment strategy."""
+
     NO_ASSIGNMENT = "no-assignment"
     WHO_LEAST_DID_FIRST = "who-least-did-first"
     RANDOM = "random"
@@ -27,6 +31,8 @@ class AssignmentType(str, Enum):
 
 
 class Chore(BaseModel):
+    """A household chore with scheduling and assignment details."""
+
     id: int
     name: str | None = None
     description: str | None = None
@@ -47,6 +53,7 @@ class Chore(BaseModel):
 
     @classmethod
     def from_current_response(cls, resp) -> Chore:
+        """Create from a current-chores API response."""
         return cls(
             id=resp.chore_id,
             last_tracked_time=resp.last_tracked_time,
@@ -55,6 +62,7 @@ class Chore(BaseModel):
 
     @classmethod
     def from_details_response(cls, resp) -> Chore:
+        """Create from a chore-details API response."""
         chore_data = resp.chore
         period_type = (
             PeriodType(chore_data.period_type)
@@ -109,6 +117,7 @@ class Chore(BaseModel):
         )
 
     def get_details(self, api_client):
+        """Fetch and populate full chore details and userfields from the API."""
         details = api_client.get_chore(self.id)
         if details:
             updated = Chore.from_details_response(details)

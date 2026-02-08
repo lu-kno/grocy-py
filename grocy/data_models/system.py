@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 
 class SystemInfo(BaseModel):
+    """Grocy server version and environment information."""
+
     grocy_version: str
     grocy_release_date: date
     php_version: str
@@ -13,6 +15,7 @@ class SystemInfo(BaseModel):
 
     @classmethod
     def from_dto(cls, dto) -> "SystemInfo":
+        """Create from a system info API response."""
         return cls(
             grocy_version=dto.grocy_version_info.version,
             grocy_release_date=dto.grocy_version_info.release_date,
@@ -24,6 +27,8 @@ class SystemInfo(BaseModel):
 
 
 class SystemTime(BaseModel):
+    """Server time and timezone information."""
+
     timezone: str
     time_local: datetime
     time_local_sqlite3: datetime
@@ -32,6 +37,7 @@ class SystemTime(BaseModel):
 
     @classmethod
     def from_dto(cls, dto) -> "SystemTime":
+        """Create from a system time API response."""
         return cls(
             timezone=dto.timezone,
             time_local=dto.time_local,
@@ -42,6 +48,8 @@ class SystemTime(BaseModel):
 
 
 class SystemConfig(BaseModel):
+    """Grocy system configuration including locale, currency, and feature flags."""
+
     username: str
     base_path: str
     base_url: str
@@ -53,6 +61,7 @@ class SystemConfig(BaseModel):
 
     @classmethod
     def from_dto(cls, dto) -> "SystemConfig":
+        """Create from a system config API response."""
         enabled_features = [
             feature
             for feature, value in dto.feature_flags.items()

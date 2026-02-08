@@ -1098,7 +1098,7 @@ class GrocyApiClient(object):
     def get_current_user(self) -> UserDto | None:
         parsed_json = self._do_get_request("user")
         if parsed_json:
-            return UserDto(**parsed_json)
+            return UserDto(**parsed_json[0])
         return None
 
     def create_user(self, data: dict):
@@ -1125,10 +1125,19 @@ class GrocyApiClient(object):
     # --- Calendar ---
 
     def get_calendar_ical(self) -> str | None:
-        return self._do_get_request("calendar/ical")
+        req_url = urljoin(self._base_url, "calendar/ical")
+        resp = requests.get(req_url, verify=self._verify_ssl, headers=self._headers)
+        if resp.status_code >= 400:
+            raise GrocyError(resp)
+        if len(resp.content) > 0:
+            return resp.text
+        return None
 
     def get_calendar_sharing_link(self) -> str | None:
-        return self._do_get_request("calendar/ical/sharing-link")
+        parsed_json = self._do_get_request("calendar/ical/sharing-link")
+        if parsed_json:
+            return parsed_json.get("url")
+        return None
 
     # --- Files ---
 

@@ -1,95 +1,49 @@
+from __future__ import annotations
+
 from datetime import datetime
 
-from grocy.base import DataModel
-from grocy.grocy_api_client import (
-    BatteryDetailsResponse,
-    CurrentBatteryResponse,
-    GrocyApiClient,
-)
+from pydantic import BaseModel
 
 
-class Battery(DataModel):
-    def __init__(self, response):
-        self._init_empty()
+class Battery(BaseModel):
+    id: int
+    name: str | None = None
+    description: str | None = None
+    used_in: str | None = None
+    charge_interval_days: int | None = None
+    created_timestamp: datetime | None = None
+    charge_cycles_count: int | None = None
+    userfields: dict | None = None
+    last_charged: datetime | None = None
+    last_tracked_time: datetime | None = None
+    next_estimated_charge_time: datetime | None = None
 
-        self._next_estimated_charge_time = response.next_estimated_charge_time
+    @classmethod
+    def from_current_response(cls, resp) -> Battery:
+        return cls(
+            id=resp.id,
+            last_tracked_time=resp.last_tracked_time,
+            next_estimated_charge_time=resp.next_estimated_charge_time,
+        )
 
-        if isinstance(response, CurrentBatteryResponse):
-            self._init_from_CurrentBatteryResponse(response)
-        elif isinstance(response, BatteryDetailsResponse):
-            self._init_from_BatteryDetailsResponse(response)
+    @classmethod
+    def from_details_response(cls, resp) -> Battery:
+        return cls(
+            id=resp.battery.id,
+            name=resp.battery.name,
+            description=resp.battery.description,
+            used_in=resp.battery.used_in,
+            charge_interval_days=resp.battery.charge_interval_days,
+            created_timestamp=resp.battery.created_timestamp,
+            userfields=resp.battery.userfields,
+            charge_cycles_count=resp.charge_cycles_count,
+            last_charged=resp.last_charged,
+            last_tracked_time=resp.last_charged,
+            next_estimated_charge_time=resp.next_estimated_charge_time,
+        )
 
-    def _init_from_CurrentBatteryResponse(self, response: CurrentBatteryResponse):
-        self._id = response.id
-        self._last_tracked_time = response.last_tracked_time
-
-    def _init_from_BatteryDetailsResponse(self, response: BatteryDetailsResponse):
-        self._charge_cycles_count = response.charge_cycles_count
-        self._last_charged = response.last_charged
-        self._last_tracked_time = response.last_charged  # For compatibility
-        self._id = response.battery.id
-        self._name = response.battery.name
-        self._description = response.battery.description
-        self._used_in = response.battery.used_in
-        self._charge_interval_days = response.battery.charge_interval_days
-        self._created_timestamp = response.battery.created_timestamp
-        self._userfields = response.battery.userfields
-
-    def _init_empty(self):
-        self._last_tracked_time = None
-        self._charge_cycles_count = None
-        self._last_charged = None
-        self._name = None
-        self._description = None
-        self._used_in = None
-        self._charge_interval_days = None
-        self._created_timestamp = None
-        self._userfields = None
-
-    def get_details(self, api_client: GrocyApiClient):
-        details = api_client.get_battery(self._id)
-        self._init_from_BatteryDetailsResponse(details)
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def used_in(self) -> str:
-        return self._used_in
-
-    @property
-    def charge_interval_days(self) -> int:
-        return self._charge_interval_days
-
-    @property
-    def created_timestamp(self) -> datetime:
-        return self._created_timestamp
-
-    @property
-    def charge_cycles_count(self) -> int:
-        return self._charge_cycles_count
-
-    @property
-    def userfields(self):
-        return self._userfields
-
-    @property
-    def last_charged(self) -> datetime:
-        return self._last_charged
-
-    @property
-    def last_tracked_time(self) -> datetime:
-        return self._last_tracked_time
-
-    @property
-    def next_estimated_charge_time(self) -> datetime:
-        return self._next_estimated_charge_time
+    def get_details(self, api_client):
+        details = api_client.get_battery(self.id)
+        if details:
+            updated = Battery.from_details_response(details)
+            self.__dict__.update(updated.__dict__)

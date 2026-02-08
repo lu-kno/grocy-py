@@ -7,7 +7,7 @@ from grocy.errors import GrocyError
 class TestProductGroups:
     @pytest.mark.vcr
     def test_get_product_groups_valid(self, grocy):
-        product_groups_list = grocy.product_groups()
+        product_groups_list = grocy.stock.product_groups()
 
         assert isinstance(product_groups_list, list)
         assert len(product_groups_list) == 7
@@ -25,7 +25,7 @@ class TestProductGroups:
     @pytest.mark.vcr
     def test_get_product_groups_filters_valid(self, grocy):
         query_filter = ["id=6"]
-        product_groups = grocy.product_groups(query_filters=query_filter)
+        product_groups = grocy.stock.product_groups(query_filters=query_filter)
 
         for item in product_groups:
             assert item.id == 6
@@ -33,7 +33,7 @@ class TestProductGroups:
     @pytest.mark.vcr
     def test_get_product_groups_filters_invalid(self, grocy, invalid_query_filter):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.product_groups(query_filters=invalid_query_filter)
+            grocy.stock.product_groups(query_filters=invalid_query_filter)
 
         error = exc_info.value
         assert error.status_code == 500

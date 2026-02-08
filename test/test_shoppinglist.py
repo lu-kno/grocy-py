@@ -7,7 +7,7 @@ from grocy.errors import GrocyError
 class TestShoppingList:
     @pytest.mark.vcr
     def test_get_shopping_list_valid(self, grocy):
-        shopping_list = grocy.shopping_list(True)
+        shopping_list = grocy.shopping_list.items(True)
 
         assert isinstance(shopping_list, list)
         assert len(shopping_list) == 5
@@ -30,16 +30,16 @@ class TestShoppingList:
 
     @pytest.mark.vcr
     def test_add_missing_product_to_shopping_list_valid(self, grocy):
-        assert grocy.add_missing_product_to_shopping_list() is None
+        assert grocy.shopping_list.add_missing_products() is None
 
     @pytest.mark.vcr
     def test_add_product_to_shopping_list_valid(self, grocy):
-        grocy.add_product_to_shopping_list(19)
+        grocy.shopping_list.add_product(19)
 
     @pytest.mark.vcr
     def test_add_nonexistant_product_to_shopping_list(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.add_product_to_shopping_list(3000)
+            grocy.shopping_list.add_product(3000)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -48,7 +48,7 @@ class TestShoppingList:
     @pytest.mark.vcr
     def test_add_missing_products_to_nonexistant_shopping_list(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.add_missing_product_to_shopping_list(3000)
+            grocy.shopping_list.add_missing_products(3000)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -56,16 +56,16 @@ class TestShoppingList:
 
     @pytest.mark.vcr
     def test_clear_shopping_list_valid(self, grocy):
-        grocy.clear_shopping_list()
+        grocy.shopping_list.clear()
 
     @pytest.mark.vcr
     def test_remove_product_in_shopping_list_valid(self, grocy):
-        grocy.remove_product_in_shopping_list(20)
+        grocy.shopping_list.remove_product(20)
 
     @pytest.mark.vcr
     def test_get_shopping_list_filters_valid(self, grocy):
         query_filter = ["note~snacks"]
-        shopping_list = grocy.shopping_list(
+        shopping_list = grocy.shopping_list.items(
             get_details=True, query_filters=query_filter
         )
 
@@ -75,7 +75,9 @@ class TestShoppingList:
     @pytest.mark.vcr
     def test_get_shopping_list_filters_invalid(self, grocy, invalid_query_filter):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.shopping_list(get_details=True, query_filters=invalid_query_filter)
+            grocy.shopping_list.items(
+                get_details=True, query_filters=invalid_query_filter
+            )
 
         error = exc_info.value
         assert error.status_code == 500

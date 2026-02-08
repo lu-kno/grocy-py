@@ -7,7 +7,7 @@ from grocy.errors import GrocyError
 class TestStock:
     @pytest.mark.vcr
     def test_get_stock_valid(self, grocy):
-        stock = grocy.stock()
+        stock = grocy.stock.current()
 
         assert isinstance(stock, list)
         assert len(stock) == 24
@@ -16,7 +16,7 @@ class TestStock:
 
     @pytest.mark.vcr
     def test_get_due_products_valid(self, grocy):
-        due_products = grocy.due_products(True)
+        due_products = grocy.stock.due_products(True)
 
         assert isinstance(due_products, list)
         assert len(due_products) == 4
@@ -25,7 +25,7 @@ class TestStock:
 
     @pytest.mark.vcr
     def test_get_expired_products_valid(self, grocy):
-        expired_products = grocy.expired_products(True)
+        expired_products = grocy.stock.expired_products(True)
 
         assert isinstance(expired_products, list)
         assert len(expired_products) == 1
@@ -34,7 +34,7 @@ class TestStock:
 
     @pytest.mark.vcr
     def test_get_missing_products_valid(self, grocy):
-        missing_products = grocy.missing_products(True)
+        missing_products = grocy.stock.missing_products(True)
 
         assert isinstance(missing_products, list)
         assert len(missing_products) == 1
@@ -49,7 +49,7 @@ class TestStock:
 
     @pytest.mark.vcr
     def test_get_overdue_products_valid(self, grocy):
-        overdue_products = grocy.overdue_products(True)
+        overdue_products = grocy.stock.overdue_products(True)
 
         assert isinstance(overdue_products, list)
         assert len(overdue_products) == 4
@@ -58,12 +58,12 @@ class TestStock:
 
     @pytest.mark.vcr
     def test_open_product_valid(self, grocy):
-        grocy.open_product(13, 1)
+        grocy.stock.open(13, 1)
 
     @pytest.mark.vcr
     def test_open_product_error(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.open_product(13, 0)
+            grocy.stock.open(13, 0)
 
         error = exc_info.value
         assert error.status_code == 400

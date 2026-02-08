@@ -1,13 +1,14 @@
 from datetime import date, datetime
 
 import pytest
+
 from grocy.data_models.system import SystemConfig, SystemInfo, SystemTime
 
 
 class TestSystem:
     @pytest.mark.vcr
     def test_get_last_db_changed_valid(self, grocy):
-        timestamp = grocy.get_last_db_changed()
+        timestamp = grocy.system.db_changed_time()
 
         assert isinstance(timestamp, datetime)
         assert timestamp.year == 2026
@@ -16,7 +17,7 @@ class TestSystem:
 
     @pytest.mark.vcr
     def test_get_system_info_valid(self, grocy):
-        system_info = grocy.get_system_info()
+        system_info = grocy.system.info()
 
         assert isinstance(system_info, SystemInfo)
         assert isinstance(system_info.grocy_release_date, date)
@@ -26,7 +27,7 @@ class TestSystem:
 
     @pytest.mark.vcr
     def test_get_system_time_valid(self, grocy):
-        system_time = grocy.get_system_time()
+        system_time = grocy.system.time()
 
         assert isinstance(system_time, SystemTime)
         assert isinstance(system_time.time_local, datetime)
@@ -38,7 +39,7 @@ class TestSystem:
 
     @pytest.mark.vcr
     def test_get_system_config_valid(self, grocy):
-        system_config = grocy.get_system_config()
+        system_config = grocy.system.config()
 
         assert isinstance(system_config, SystemConfig)
 

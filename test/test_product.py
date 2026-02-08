@@ -7,7 +7,7 @@ from grocy.errors.grocy_error import GrocyError
 class TestProduct:
     @pytest.mark.vcr
     def test_get_all_products(self, grocy):
-        products = grocy.all_products()
+        products = grocy.stock.all_products()
 
         assert len(products) == 29
 
@@ -17,7 +17,7 @@ class TestProduct:
 
     @pytest.mark.vcr
     def test_product_get_details_valid(self, grocy):
-        product = grocy.product(8)
+        product = grocy.stock.product(8)
 
         assert isinstance(product, Product)
         assert product.name == "Gulash soup"
@@ -35,7 +35,7 @@ class TestProduct:
 
     @pytest.mark.vcr
     def test_product_no_barcodes(self, grocy):
-        stock = grocy.stock()
+        stock = grocy.stock.current()
         product = next(prod for prod in stock if prod.id == 2)
 
         assert product.name == "Chocolate"
@@ -46,7 +46,7 @@ class TestProduct:
     @pytest.mark.vcr
     def test_product_get_details_non_existant(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.product(200)
+            grocy.stock.product(200)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -59,11 +59,11 @@ class TestProduct:
 
         mocker.patch("builtins.open", mocker.mock_open())
 
-        assert grocy.add_product_pic(20, "/somepath/pic.jpg") is None
+        assert grocy.stock.upload_product_picture(20, "/somepath/pic.jpg") is None
 
     @pytest.mark.vcr
     def test_get_product_by_barcode(self, grocy):
-        product = grocy.product_by_barcode("42141099")
+        product = grocy.stock.product_by_barcode("42141099")
 
         assert isinstance(product, Product)
         assert product.name == "Crisps"
@@ -78,7 +78,7 @@ class TestProduct:
     @pytest.mark.vcr
     def test_product_by_barcode_get_details_non_existant(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.product_by_barcode(200)
+            grocy.stock.product_by_barcode(200)
 
         error = exc_info.value
         assert error.status_code == 400

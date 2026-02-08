@@ -7,8 +7,8 @@ class TestMisc:
         parsed_data = {"barcode": "123"}
         data = ProductBarcodeData(**parsed_data)
 
-        barcode = ProductBarcode(data)
-        result = barcode.toJson()
+        barcode = ProductBarcode(barcode=data.barcode, amount=data.amount)
+        result = barcode.model_dump_json()
 
         assert result is not None
         assert "barcode" in result

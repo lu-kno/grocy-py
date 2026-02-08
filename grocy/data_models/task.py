@@ -1,92 +1,61 @@
+from __future__ import annotations
+
 from datetime import datetime
 
-from grocy.base import DataModel
-from grocy.data_models.user import User
-from grocy.grocy_api_client import TaskCategoryDto, TaskResponse
+from pydantic import BaseModel
+
+from .user import User
 
 
-class TaskCategory(DataModel):
-    def __init__(self, data: TaskCategoryDto):
-        self._id = data.id
-        self._name = data.name
-        self._description = data.description
-        self._row_created_timestamp = data.row_created_timestamp
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def row_created_timestamp(self) -> datetime:
-        return self._row_created_timestamp
+class TaskCategory(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    row_created_timestamp: datetime | None = None
 
 
-class Task(DataModel):
-    def __init__(self, response: TaskResponse):
-        self._id = response.id
-        self._name = response.name
-        self._description = response.description
-        self._due_date = response.due_date
-        self._done = response.done
-        self._done_timestamp = response.done_timestamp
-        self._category_id = response.category_id
-        self._category = None
-        if response.category:
-            self._category = TaskCategory(response.category)
-        self._assigned_to_user_id = response.assigned_to_user_id
-        self._assigned_to_user = None
-        if response.assigned_to_user:
-            self._assigned_to_user = User(response.assigned_to_user)
-        self._userfields = response.userfields
+class Task(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    due_date: datetime | None = None
+    done: int = 0
+    done_timestamp: datetime | None = None
+    category_id: int | None = None
+    category: TaskCategory | None = None
+    assigned_to_user_id: int | None = None
+    assigned_to_user: User | None = None
+    userfields: dict | None = None
 
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def due_date(self) -> datetime.date:
-        return self._due_date
-
-    @property
-    def done(self) -> int:
-        return self._done
-
-    @property
-    def done_timestamp(self) -> datetime:
-        return self._done_timestamp
-
-    @property
-    def category_id(self) -> int:
-        return self._category_id
-
-    @property
-    def category(self) -> TaskCategory:
-        return self._category
-
-    @property
-    def assigned_to_user_id(self) -> int:
-        return self._assigned_to_user_id
-
-    @property
-    def assigned_to_user(self) -> User:
-        return self._assigned_to_user
-
-    @property
-    def userfields(self) -> dict[str, str]:
-        return self._userfields
+    @classmethod
+    def from_response(cls, resp) -> Task:
+        category = None
+        if resp.category:
+            category = TaskCategory(
+                id=resp.category.id,
+                name=resp.category.name,
+                description=resp.category.description,
+                row_created_timestamp=resp.category.row_created_timestamp,
+            )
+        assigned_user = None
+        if resp.assigned_to_user:
+            assigned_user = User(
+                id=resp.assigned_to_user.id,
+                username=resp.assigned_to_user.username,
+                first_name=resp.assigned_to_user.first_name,
+                last_name=resp.assigned_to_user.last_name,
+                display_name=resp.assigned_to_user.display_name,
+            )
+        return cls(
+            id=resp.id,
+            name=resp.name,
+            description=resp.description,
+            due_date=resp.due_date,
+            done=resp.done,
+            done_timestamp=resp.done_timestamp,
+            category_id=resp.category_id,
+            category=category,
+            assigned_to_user_id=resp.assigned_to_user_id,
+            assigned_to_user=assigned_user,
+            userfields=resp.userfields,
+        )

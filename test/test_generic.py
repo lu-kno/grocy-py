@@ -9,14 +9,14 @@ class TestGeneric:
     def test_generic_add_valid(self, grocy):
         data = {"name": "Testbattery"}
 
-        grocy.add_generic(EntityType.BATTERIES, data)
+        grocy.generic.create(EntityType.BATTERIES, data)
 
     @pytest.mark.vcr
     def test_generic_add_invalid(self, grocy):
         data = {"eman": "Testbattery"}
 
         with pytest.raises(GrocyError) as exc_info:
-            grocy.add_generic(EntityType.BATTERIES, data)
+            grocy.generic.create(EntityType.BATTERIES, data)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -25,14 +25,14 @@ class TestGeneric:
     def test_generic_update_valid(self, grocy):
         updated_data = {"name": "Le new battery"}
 
-        grocy.update_generic(EntityType.BATTERIES, 1, updated_data)
+        grocy.generic.update(EntityType.BATTERIES, 1, updated_data)
 
     @pytest.mark.vcr
     def test_generic_update_invalid_id(self, grocy):
         updated_data = {"name": "Le new battery"}
 
         with pytest.raises(GrocyError) as exc_info:
-            grocy.update_generic(EntityType.BATTERIES, 1000, updated_data)
+            grocy.generic.update(EntityType.BATTERIES, 1000, updated_data)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -41,7 +41,7 @@ class TestGeneric:
     @pytest.mark.vcr
     def test_generic_update_invalid_data(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.update_generic(EntityType.BATTERIES, 1, None)
+            grocy.generic.update(EntityType.BATTERIES, 1, None)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -49,12 +49,12 @@ class TestGeneric:
 
     @pytest.mark.vcr
     def test_delete_generic_success(self, grocy):
-        grocy.delete_generic(EntityType.TASKS, 3)
+        grocy.generic.delete(EntityType.TASKS, 3)
 
     @pytest.mark.vcr
     def test_delete_generic_error(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.delete_generic(EntityType.TASKS, 30000)
+            grocy.generic.delete(EntityType.TASKS, 30000)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -62,7 +62,7 @@ class TestGeneric:
     @pytest.mark.vcr
     def test_get_generic_objects_for_type_filters_valid(self, grocy):
         query_filter = ["name=Walmart"]
-        shopping_locations = grocy.get_generic_objects_for_type(
+        shopping_locations = grocy.generic.list(
             EntityType.SHOPPING_LOCATIONS, query_filters=query_filter
         )
 
@@ -73,7 +73,7 @@ class TestGeneric:
         self, grocy, invalid_query_filter
     ):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.get_generic_objects_for_type(
+            grocy.generic.list(
                 EntityType.SHOPPING_LOCATIONS, query_filters=invalid_query_filter
             )
 

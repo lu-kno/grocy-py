@@ -1,13 +1,11 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 
-from grocy.base import DataModel
-from grocy.data_models.user import User
-from grocy.grocy_api_client import (
-    ChoreDetailsResponse,
-    CurrentChoreResponse,
-    GrocyApiClient,
-)
+from pydantic import BaseModel
+
+from .user import User
 
 
 class PeriodType(str, Enum):
@@ -28,132 +26,91 @@ class AssignmentType(str, Enum):
     IN_ALPHABETICAL_ORDER = "in-alphabetical-order"
 
 
-class Chore(DataModel):
-    def __init__(self, response):
-        if isinstance(response, CurrentChoreResponse):
-            self._init_from_CurrentChoreResponse(response)
-        elif isinstance(response, ChoreDetailsResponse):
-            self._init_from_ChoreDetailsResponse(response)
+class Chore(BaseModel):
+    id: int
+    name: str | None = None
+    description: str | None = None
+    period_type: PeriodType | None = None
+    period_config: str | None = None
+    period_days: int | None = None
+    track_date_only: bool | None = None
+    rollover: bool | None = None
+    assignment_type: AssignmentType | None = None
+    assignment_config: str | None = None
+    next_execution_assigned_to_user_id: int | None = None
+    userfields: dict | None = None
+    last_tracked_time: datetime | None = None
+    next_estimated_execution_time: datetime | None = None
+    last_done_by: User | None = None
+    track_count: int | None = None
+    next_execution_assigned_user: User | None = None
 
-    # noinspection PyPep8Naming
-    def _init_from_CurrentChoreResponse(self, response: CurrentChoreResponse):
-        self._id = response.chore_id
-        self._last_tracked_time = response.last_tracked_time
-        self._next_estimated_execution_time = response.next_estimated_execution_time
-        self._name = None
-        self._last_done_by = None
-
-    # noinspection PyPep8Naming
-    def _init_from_ChoreDetailsResponse(self, response: ChoreDetailsResponse):
-        chore_data = response.chore
-        self._id = chore_data.id
-        self._name = chore_data.name
-        self._description = chore_data.description
-
-        if chore_data.period_type is not None:
-            self._period_type = PeriodType(chore_data.period_type)
-        else:
-            self._period_type = None
-
-        self._period_config = chore_data.period_config
-        self._period_days = chore_data.period_days
-        self._track_date_only = chore_data.track_date_only
-        self._rollover = chore_data.rollover
-
-        if chore_data.assignment_type is not None:
-            self._assignment_type = AssignmentType(chore_data.assignment_type)
-        else:
-            self._assignment_type = None
-
-        self._assignment_config = chore_data.assignment_config
-        self._next_execution_assigned_to_user_id = (
-            chore_data.next_execution_assigned_to_user_id
+    @classmethod
+    def from_current_response(cls, resp) -> Chore:
+        return cls(
+            id=resp.chore_id,
+            last_tracked_time=resp.last_tracked_time,
+            next_estimated_execution_time=resp.next_estimated_execution_time,
         )
-        self._userfields = chore_data.userfields
 
-        self._last_tracked_time = response.last_tracked
-        self._next_estimated_execution_time = response.next_estimated_execution_time
-        if response.last_done_by is not None:
-            self._last_done_by = User(response.last_done_by)
-        else:
-            self._last_done_by = None
-        self._track_count = response.track_count
-        if response.next_execution_assigned_user is not None:
-            self._next_execution_assigned_user = User(
-                response.next_execution_assigned_user
+    @classmethod
+    def from_details_response(cls, resp) -> Chore:
+        chore_data = resp.chore
+        period_type = (
+            PeriodType(chore_data.period_type)
+            if chore_data.period_type is not None
+            else None
+        )
+        assignment_type = (
+            AssignmentType(chore_data.assignment_type)
+            if chore_data.assignment_type is not None
+            else None
+        )
+        last_done_by = (
+            User(
+                id=resp.last_done_by.id,
+                username=resp.last_done_by.username,
+                first_name=resp.last_done_by.first_name,
+                last_name=resp.last_done_by.last_name,
+                display_name=resp.last_done_by.display_name,
             )
-        else:
-            self._next_execution_assigned_user = None
+            if resp.last_done_by
+            else None
+        )
+        next_user = (
+            User(
+                id=resp.next_execution_assigned_user.id,
+                username=resp.next_execution_assigned_user.username,
+                first_name=resp.next_execution_assigned_user.first_name,
+                last_name=resp.next_execution_assigned_user.last_name,
+                display_name=resp.next_execution_assigned_user.display_name,
+            )
+            if resp.next_execution_assigned_user
+            else None
+        )
+        return cls(
+            id=chore_data.id,
+            name=chore_data.name,
+            description=chore_data.description,
+            period_type=period_type,
+            period_config=chore_data.period_config,
+            period_days=chore_data.period_days,
+            track_date_only=chore_data.track_date_only,
+            rollover=chore_data.rollover,
+            assignment_type=assignment_type,
+            assignment_config=chore_data.assignment_config,
+            next_execution_assigned_to_user_id=chore_data.next_execution_assigned_to_user_id,
+            userfields=chore_data.userfields,
+            last_tracked_time=resp.last_tracked,
+            next_estimated_execution_time=resp.next_estimated_execution_time,
+            last_done_by=last_done_by,
+            track_count=resp.track_count,
+            next_execution_assigned_user=next_user,
+        )
 
-    def get_details(self, api_client: GrocyApiClient):
+    def get_details(self, api_client):
         details = api_client.get_chore(self.id)
-        self._init_from_ChoreDetailsResponse(details)
-        self._userfields = api_client.get_userfields("chores", self.id)
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def period_type(self) -> PeriodType:
-        return self._period_type
-
-    @property
-    def period_config(self) -> str:
-        return self._period_config
-
-    @property
-    def period_days(self) -> int:
-        return self._period_days
-
-    @property
-    def track_date_only(self) -> bool:
-        return self._track_date_only
-
-    @property
-    def rollover(self) -> bool:
-        return self._rollover
-
-    @property
-    def assignment_type(self) -> AssignmentType:
-        return self._assignment_type
-
-    @property
-    def assignment_config(self) -> str:
-        return self._assignment_config
-
-    @property
-    def next_execution_assigned_to_user_id(self) -> int:
-        return self._next_execution_assigned_to_user_id
-
-    @property
-    def userfields(self) -> dict[str, str]:
-        return self._userfields
-
-    @property
-    def last_tracked_time(self) -> datetime:
-        return self._last_tracked_time
-
-    @property
-    def next_estimated_execution_time(self) -> datetime:
-        return self._next_estimated_execution_time
-
-    @property
-    def last_done_by(self) -> User:
-        return self._last_done_by
-
-    @property
-    def track_count(self) -> int:
-        return self._track_count
-
-    @property
-    def next_execution_assigned_user(self) -> User:
-        return self._next_execution_assigned_user
+        if details:
+            updated = Chore.from_details_response(details)
+            self.__dict__.update(updated.__dict__)
+            self.userfields = api_client.get_userfields("chores", self.id)

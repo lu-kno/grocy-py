@@ -10,7 +10,7 @@ from grocy.errors import GrocyError
 class TestChores:
     @pytest.mark.vcr
     def test_get_chores_valid(self, grocy):
-        chores = grocy.chores(get_details=True)
+        chores = grocy.chores.list(get_details=True)
 
         assert isinstance(chores, list)
         assert len(chores) == 6
@@ -30,7 +30,7 @@ class TestChores:
 
     @pytest.mark.vcr
     def test_get_chore_details(self, grocy):
-        chore_details = grocy.chore(3)
+        chore_details = grocy.chores.get(3)
         assert isinstance(chore_details, Chore)
 
         assert chore_details.name == "Take out the trash"
@@ -48,12 +48,12 @@ class TestChores:
 
     @pytest.mark.vcr
     def test_execute_chore_valid(self, grocy):
-        result = grocy.execute_chore(1)
+        result = grocy.chores.execute(1)
         assert not isinstance(result, GrocyError)
 
     @pytest.mark.vcr
     def test_execute_chore_valid_with_data(self, grocy):
-        result = grocy.execute_chore(
+        result = grocy.chores.execute(
             1, done_by=1, tracked_time=datetime.now(), skipped=False
         )
         assert not isinstance(result, GrocyError)
@@ -61,7 +61,7 @@ class TestChores:
     @pytest.mark.vcr
     def test_execute_chore_invalid(self, grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.execute_chore(1000)
+            grocy.chores.execute(1000)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -69,7 +69,7 @@ class TestChores:
     @pytest.mark.vcr
     def test_get_chores_filters_valid(self, grocy):
         query_filter = ["next_execution_assigned_to_user_id=1"]
-        chores = grocy.chores(get_details=True, query_filters=query_filter)
+        chores = grocy.chores.list(get_details=True, query_filters=query_filter)
 
         for item in chores:
             assert item.next_execution_assigned_to_user_id == 1
@@ -77,7 +77,7 @@ class TestChores:
     @pytest.mark.vcr
     def test_get_chores_filters_invalid(self, grocy, invalid_query_filter):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.chores(get_details=True, query_filters=invalid_query_filter)
+            grocy.chores.list(get_details=True, query_filters=invalid_query_filter)
 
         error = exc_info.value
         assert error.status_code == 500

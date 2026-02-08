@@ -9,14 +9,14 @@ from grocy.grocy import Grocy
 class TestBattery:
     @pytest.mark.vcr
     def test_get_batteries_valid(self, grocy: Grocy):
-        batteries = grocy.batteries(get_details=False)
+        batteries = grocy.batteries.list(get_details=False)
 
         assert len(batteries) == 4
         assert isinstance(batteries[0].last_tracked_time, datetime)
 
     @pytest.mark.vcr
     def test_get_batteries_with_details_valid(self, grocy):
-        batteries = grocy.batteries(get_details=True)
+        batteries = grocy.batteries.list(get_details=True)
 
         assert len(batteries) == 4
         assert isinstance(batteries[0].last_tracked_time, datetime)
@@ -26,7 +26,7 @@ class TestBattery:
 
     @pytest.mark.vcr
     def test_get_battery_details_valid(self, grocy):
-        battery = grocy.battery(1)
+        battery = grocy.batteries.get(1)
 
         assert battery.id == 1
         assert battery.name == "Battery1"
@@ -41,12 +41,12 @@ class TestBattery:
 
     @pytest.mark.vcr
     def test_charge_battery(self, grocy):
-        assert grocy.charge_battery(1)
+        assert grocy.batteries.charge(1)
 
     @pytest.mark.vcr
     def test_get_batteries_filters_valid(self, grocy):
         query_filter = ["next_estimated_charge_time<2022-06-20"]
-        batteries = grocy.batteries(query_filters=query_filter)
+        batteries = grocy.batteries.list(query_filters=query_filter)
 
         for item in batteries:
             assert item.next_estimated_charge_time < datetime(2022, 6, 20)
@@ -54,7 +54,7 @@ class TestBattery:
     @pytest.mark.vcr
     def test_get_batteries_filters_invalid(self, grocy, invalid_query_filter):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.batteries(query_filters=invalid_query_filter)
+            grocy.batteries.list(query_filters=invalid_query_filter)
 
         error = exc_info.value
         assert error.status_code == 500

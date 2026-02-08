@@ -1,117 +1,70 @@
 from datetime import date, datetime
 
-from grocy.base import DataModel
-from grocy.grocy_api_client import SystemConfigDto, SystemInfoDto, SystemTimeDto
+from pydantic import BaseModel
 
 
-class SystemInfo(DataModel):
-    def __init__(self, system_info_dto: SystemInfoDto):
-        self._grocy_version = system_info_dto.grocy_version_info.version
-        self._grocy_release_date = system_info_dto.grocy_version_info.release_date
-        self._php_version = system_info_dto.php_version
-        self._sqlite_version = system_info_dto.sqlite_version
-        self._os = system_info_dto.os
-        self._client = system_info_dto.client
+class SystemInfo(BaseModel):
+    grocy_version: str
+    grocy_release_date: date
+    php_version: str
+    sqlite_version: str
+    os: str
+    client: str
 
-    @property
-    def grocy_version(self) -> str:
-        return self._grocy_version
-
-    @property
-    def grocy_release_date(self) -> date:
-        return self._grocy_release_date
-
-    @property
-    def php_version(self) -> str:
-        return self._php_version
-
-    @property
-    def sqlite_version(self) -> str:
-        return self._sqlite_version
-
-    @property
-    def os(self) -> str:
-        return self._os
-
-    @property
-    def client(self) -> str:
-        return self._client
+    @classmethod
+    def from_dto(cls, dto) -> "SystemInfo":
+        return cls(
+            grocy_version=dto.grocy_version_info.version,
+            grocy_release_date=dto.grocy_version_info.release_date,
+            php_version=dto.php_version,
+            sqlite_version=dto.sqlite_version,
+            os=dto.os,
+            client=dto.client,
+        )
 
 
-class SystemTime(DataModel):
-    def __init__(self, system_time_dto: SystemTimeDto):
-        self._timezone = system_time_dto.timezone
-        self._time_local = system_time_dto.time_local
-        self._time_local_sqlite3 = system_time_dto.time_local_sqlite3
-        self._time_utc = system_time_dto.time_utc
-        self._timestamp = system_time_dto.timestamp
+class SystemTime(BaseModel):
+    timezone: str
+    time_local: datetime
+    time_local_sqlite3: datetime
+    time_utc: datetime
+    timestamp: int
 
-    @property
-    def timezone(self) -> str:
-        return self._timezone
-
-    @property
-    def time_local(self) -> datetime:
-        return self._time_local
-
-    @property
-    def time_local_sqlite3(self) -> datetime:
-        return self._time_local_sqlite3
-
-    @property
-    def time_utc(self) -> datetime:
-        return self._time_utc
-
-    @property
-    def timestamp(self) -> int:
-        return self._timestamp
+    @classmethod
+    def from_dto(cls, dto) -> "SystemTime":
+        return cls(
+            timezone=dto.timezone,
+            time_local=dto.time_local,
+            time_local_sqlite3=dto.time_local_sqlite3,
+            time_utc=dto.time_utc,
+            timestamp=dto.timestamp,
+        )
 
 
-class SystemConfig(DataModel):
-    def __init__(self, system_config_dto: SystemConfigDto):
-        self._username = system_config_dto.username
-        self._base_path = system_config_dto.base_path
-        self._base_url = system_config_dto.base_url
-        self._mode = system_config_dto.mode
-        self._default_locale = system_config_dto.default_locale
-        self._locale = system_config_dto.locale
-        self._currency = system_config_dto.currency
+class SystemConfig(BaseModel):
+    username: str
+    base_path: str
+    base_url: str
+    mode: str
+    default_locale: str
+    locale: str
+    currency: str
+    enabled_features: list[str] = []
 
-        self._enabled_features = [
+    @classmethod
+    def from_dto(cls, dto) -> "SystemConfig":
+        enabled_features = [
             feature
-            for feature, value in system_config_dto.feature_flags.items()
-            if value
-            not in (False, "0")  # The default is enabled, disabled can be False or "0"
+            for feature, value in dto.feature_flags.items()
+            if value not in (False, "0")
         ]
-
-    @property
-    def username(self) -> str:
-        return self._username
-
-    @property
-    def base_path(self) -> str:
-        return self._base_path
-
-    @property
-    def base_url(self) -> str:
-        return self._base_url
-
-    @property
-    def mode(self) -> str:
-        return self._mode
-
-    @property
-    def default_locale(self) -> str:
-        return self._default_locale
-
-    @property
-    def locale(self) -> str:
-        return self._locale
-
-    @property
-    def currency(self) -> str:
-        return self._currency
-
-    @property
-    def enabled_features(self) -> list[str]:
-        return self._enabled_features
+        return cls(
+            username=dto.username,
+            base_path=dto.base_path,
+            base_url=dto.base_url,
+            mode=dto.mode,
+            default_locale=dto.default_locale,
+            locale=dto.locale,
+            currency=dto.currency,
+            enabled_features=enabled_features,
+        )

@@ -28,7 +28,7 @@ class TestGrocy(TestCase):
         responses.add(
             responses.GET, f"{self.base_url}/objects/shopping_list", status=400
         )
-        self.assertRaises(GrocyError, self.grocy.shopping_list)
+        self.assertRaises(GrocyError, self.grocy.shopping_list.items)
 
     @responses.activate
     def test_get_shopping_list_invalid_missing_data(self):
@@ -39,14 +39,14 @@ class TestGrocy(TestCase):
             json=resp,
             status=200,
         )
-        self.assertEqual(len(self.grocy.shopping_list()), 0)
+        self.assertEqual(len(self.grocy.shopping_list.items()), 0)
 
     @responses.activate
     def test_clear_shopping_list_error(self):
         responses.add(
             responses.POST, f"{self.base_url}/stock/shoppinglist/clear", status=400
         )
-        self.assertRaises(GrocyError, self.grocy.clear_shopping_list)
+        self.assertRaises(GrocyError, self.grocy.shopping_list.clear)
 
     @responses.activate
     def test_remove_product_in_shopping_list_error(self):
@@ -55,14 +55,14 @@ class TestGrocy(TestCase):
             f"{self.base_url}/stock/shoppinglist/remove-product",
             status=400,
         )
-        self.assertRaises(GrocyError, self.grocy.remove_product_in_shopping_list, 1)
+        self.assertRaises(GrocyError, self.grocy.shopping_list.remove_product, 1)
 
     @responses.activate
     def test_get_product_groups_invalid_no_data(self):
         responses.add(
             responses.GET, f"{self.base_url}/objects/product_groups", status=400
         )
-        self.assertRaises(GrocyError, self.grocy.product_groups)
+        self.assertRaises(GrocyError, self.grocy.stock.product_groups)
 
     @responses.activate
     def test_get_product_groups_invalid_missing_data(self):
@@ -73,14 +73,17 @@ class TestGrocy(TestCase):
             json=resp,
             status=200,
         )
-        self.assertEqual(len(self.grocy.product_groups()), 0)
+        self.assertEqual(len(self.grocy.stock.product_groups()), 0)
 
     @responses.activate
     def test_add_product_pic_invalid_missing_data(self):
         with patch("os.path.exists") as m_exist:
             m_exist.return_value = False
             self.assertRaises(
-                FileNotFoundError, self.grocy.add_product_pic, 1, "/somepath/pic.jpg"
+                FileNotFoundError,
+                self.grocy.stock.upload_product_picture,
+                1,
+                "/somepath/pic.jpg",
             )
 
     @responses.activate
@@ -118,7 +121,7 @@ class TestGrocy(TestCase):
             responses.GET, f"{self.base_url}/stock/volatile", json=resp, status=200
         )
 
-        self.grocy.due_products(True)
+        self.grocy.stock.due_products(True)
 
     @responses.activate
     def test_get_expired_invalid_no_data(self):
@@ -127,7 +130,7 @@ class TestGrocy(TestCase):
             responses.GET, f"{self.base_url}/stock/volatile", json=resp, status=200
         )
 
-        self.grocy.expired_products(True)
+        self.grocy.stock.expired_products(True)
 
     @responses.activate
     def test_get_expired_invalid_missing_data(self):
@@ -143,7 +146,7 @@ class TestGrocy(TestCase):
             responses.GET, f"{self.base_url}/stock/volatile", json=resp, status=200
         )
 
-        self.grocy.missing_products(True)
+        self.grocy.stock.missing_products(True)
 
     @responses.activate
     def test_get_missing_invalid_missing_data(self):
@@ -160,20 +163,25 @@ class TestGrocy(TestCase):
             responses.GET, f"{self.base_url}/userfields/chores/1", json=resp, status=200
         )
 
-        a_chore_uf = self.grocy.get_userfields("chores", 1)
+        a_chore_uf = self.grocy.generic.get_userfields("chores", 1)
 
         self.assertEqual(a_chore_uf["uf1"], 0)
 
     @responses.activate
     def test_set_userfields_valid(self):
         responses.add(responses.PUT, f"{self.base_url}/userfields/chores/1", status=204)
-        self.grocy.set_userfields("chores", 1, "auserfield", "value")
+        self.grocy.generic.set_userfields("chores", 1, "auserfield", "value")
 
     @responses.activate
     def test_set_userfields_error(self):
         responses.add(responses.PUT, f"{self.base_url}/userfields/chores/1", status=400)
         self.assertRaises(
-            GrocyError, self.grocy.set_userfields, "chores", 1, "auserfield", "value"
+            GrocyError,
+            self.grocy.generic.set_userfields,
+            "chores",
+            1,
+            "auserfield",
+            "value",
         )
 
     @responses.activate
@@ -186,14 +194,14 @@ class TestGrocy(TestCase):
             status=200,
         )
 
-        self.assertIsNone(self.grocy.get_last_db_changed())
+        self.assertIsNone(self.grocy.system.db_changed_time())
 
     @responses.activate
     def test_add_product_valid(self):
         responses.add(
             responses.POST, f"{self.base_url}/stock/products/1/add", status=200
         )
-        self.assertIsNone(self.grocy.add_product(1, 1.3, 2.44, self.date_test))
+        self.assertIsNone(self.grocy.stock.add(1, 1.3, 2.44, self.date_test))
 
     @responses.activate
     def test_add_product_error(self):
@@ -201,7 +209,7 @@ class TestGrocy(TestCase):
             responses.POST, f"{self.base_url}/stock/products/1/add", status=400
         )
         self.assertRaises(
-            GrocyError, self.grocy.add_product, 1, 1.3, 2.44, self.date_test
+            GrocyError, self.grocy.stock.add, 1, 1.3, 2.44, self.date_test
         )
 
     @responses.activate
@@ -209,33 +217,33 @@ class TestGrocy(TestCase):
         responses.add(
             responses.POST, f"{self.base_url}/stock/products/1/consume", status=200
         )
-        self.assertIsNone(self.grocy.consume_product(1, 1.3))
+        self.assertIsNone(self.grocy.stock.consume(1, 1.3))
 
     @responses.activate
     def test_consume_product_error(self):
         responses.add(
             responses.POST, f"{self.base_url}/stock/products/1/consume", status=400
         )
-        self.assertRaises(GrocyError, self.grocy.consume_product, 1, 1.3)
+        self.assertRaises(GrocyError, self.grocy.stock.consume, 1, 1.3)
 
     @pytest.mark.vcr
     def test_consume_recipe_valid(self):
-        self.grocy.consume_recipe(5)
+        self.grocy.recipes.consume(5)
 
     @pytest.mark.vcr
     def test_consume_recipe_error(self):
         with pytest.raises(GrocyError) as exc_info:
-            self.grocy.consume_recipe(4464)
+            self.grocy.recipes.consume(4464)
 
         error = exc_info.value
         assert error.status_code == 400
 
     @pytest.mark.vcr
     def test_inventory_product_valid(self):
-        current_inventory = int(self.grocy.product(4).available_amount)
+        current_inventory = int(self.grocy.stock.product(4).available_amount)
         new_amount = current_inventory + 10
 
-        product = self.grocy.inventory_product(
+        product = self.grocy.stock.inventory(
             4, new_amount, self.date_test, 1, 1, 150, True
         )
 
@@ -246,8 +254,8 @@ class TestGrocy(TestCase):
     @pytest.mark.vcr
     def test_inventory_product_error(self):
         with pytest.raises(GrocyError) as exc_info:
-            current_inventory = int(self.grocy.product(4).available_amount)
-            self.grocy.inventory_product(
+            current_inventory = int(self.grocy.stock.product(4).available_amount)
+            self.grocy.stock.inventory(
                 4, current_inventory, self.date_test, 1, 1, 150, True
             )
 
@@ -256,7 +264,7 @@ class TestGrocy(TestCase):
 
     @pytest.mark.vcr
     def test_add_product_by_barcode_valid(self):
-        product = self.grocy.add_product_by_barcode(
+        product = self.grocy.stock.add_by_barcode(
             "42141099", 1, 5, self.date_test, True
         )
 
@@ -267,14 +275,14 @@ class TestGrocy(TestCase):
     @pytest.mark.vcr
     def test_add_product_by_barcode_error(self):
         with pytest.raises(GrocyError) as exc_info:
-            self.grocy.add_product_by_barcode("555", 1, 5, self.date_test, True)
+            self.grocy.stock.add_by_barcode("555", 1, 5, self.date_test, True)
 
         error = exc_info.value
         assert error.status_code == 400
 
     @pytest.mark.vcr
     def test_consume_product_by_barcode_valid(self):
-        product = self.grocy.consume_product_by_barcode("42141099", 1, False, True)
+        product = self.grocy.stock.consume_by_barcode("42141099", 1, False, True)
 
         assert isinstance(product, Product)
         assert product.id == 4
@@ -283,17 +291,19 @@ class TestGrocy(TestCase):
     @pytest.mark.vcr
     def test_consume_product_by_barcode_error(self):
         with pytest.raises(GrocyError) as exc_info:
-            self.grocy.consume_product_by_barcode("555", 1, False, True)
+            self.grocy.stock.consume_by_barcode("555", 1, False, True)
 
         error = exc_info.value
         assert error.status_code == 400
 
     @pytest.mark.vcr
     def test_inventory_product_by_barcode_valid(self):
-        currentInv = int(self.grocy.product_by_barcode("42141099").available_amount)
+        currentInv = int(
+            self.grocy.stock.product_by_barcode("42141099").available_amount
+        )
         newAmount = currentInv + 10
 
-        product = self.grocy.inventory_product_by_barcode(
+        product = self.grocy.stock.inventory_by_barcode(
             "42141099", newAmount, self.date_test, 1, 150, True
         )
 
@@ -304,8 +314,10 @@ class TestGrocy(TestCase):
     @pytest.mark.vcr
     def test_inventory_product_by_barcode_error(self):
         with pytest.raises(GrocyError) as exc_info:
-            currentInv = int(self.grocy.product_by_barcode("42141099").available_amount)
-            self.grocy.inventory_product(4, currentInv, self.date_test, 1, 150, True)
+            currentInv = int(
+                self.grocy.stock.product_by_barcode("42141099").available_amount
+            )
+            self.grocy.stock.inventory(4, currentInv, self.date_test, 1, 150, True)
 
         error = exc_info.value
         assert error.status_code == 400
@@ -313,13 +325,13 @@ class TestGrocy(TestCase):
     @responses.activate
     def test_execute_chore_valid(self):
         responses.add(responses.POST, f"{self.base_url}/chores/1/execute", status=200)
-        self.assertIsNone(self.grocy.execute_chore(1, 1, self.date_test, False))
+        self.assertIsNone(self.grocy.chores.execute(1, 1, self.date_test, False))
 
     @responses.activate
     def test_execute_chore_error(self):
         responses.add(responses.POST, f"{self.base_url}/chores/1/execute", status=400)
         self.assertRaises(
-            GrocyError, self.grocy.execute_chore, 1, 1, self.date_test, False
+            GrocyError, self.grocy.chores.execute, 1, 1, self.date_test, False
         )
 
     @responses.activate
@@ -347,7 +359,7 @@ class TestGrocy(TestCase):
             json=resp_json,
             status=200,
         )
-        meal_plan = self.grocy.meal_plan()
+        meal_plan = self.grocy.meal_plan.items()
         self.assertEqual(len(meal_plan), 1)
         self.assertEqual(meal_plan[0].id, 1)
         self.assertEqual(meal_plan[0].recipe_id, 1)
@@ -375,7 +387,7 @@ class TestGrocy(TestCase):
             json=resp_json,
             status=200,
         )
-        recipe = self.grocy.recipe(1)
+        recipe = self.grocy.recipes.get(1)
         self.assertEqual(recipe.id, 1)
         self.assertEqual(recipe.name, "Pizza")
         self.assertEqual(recipe.base_servings, 4)

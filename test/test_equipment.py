@@ -6,8 +6,8 @@ from grocy.data_models.equipment import Equipment
 from grocy.errors import GrocyError
 from grocy.grocy import Grocy
 from grocy.grocy_api_client import (
-    EquipmentDetailsResponse,
     EquipmentData,
+    EquipmentDetailsResponse,
 )
 
 
@@ -17,7 +17,7 @@ class TestEquipment:
         response = EquipmentData(
             id=1, name="Test Equipment", row_created_timestamp=datetime(2025, 3, 23)
         )
-        equipment = Equipment(response)
+        equipment = Equipment.from_equipment_data(response)
 
         assert equipment.id == 1
         assert equipment.name == "Test Equipment"
@@ -39,7 +39,7 @@ class TestEquipment:
 
         response = EquipmentDetailsResponse(equipment=equipment_data)
 
-        equipment = Equipment(response)
+        equipment = Equipment.from_details_response(response)
 
         assert equipment.id == 1
         assert equipment.name == "Test Equipment"
@@ -61,7 +61,7 @@ class TestEquipment:
 
         response = EquipmentDetailsResponse(equipment=equipment_data)
 
-        equipment = Equipment(response)
+        equipment = Equipment.from_details_response(response)
         result = equipment.as_dict()
 
         expected = {
@@ -76,7 +76,7 @@ class TestEquipment:
 
     @pytest.mark.vcr
     def test_get_equipment_list(self, grocy: Grocy):
-        equipment = grocy.equipment(get_details=False)
+        equipment = grocy.equipment.list(get_details=False)
 
         assert isinstance(equipment, list)
         assert len(equipment) == 2
@@ -91,7 +91,7 @@ class TestEquipment:
 
     @pytest.mark.vcr
     def test_get_equipment_with_details(self, grocy: Grocy):
-        equipment = grocy.equipment(get_details=True)
+        equipment = grocy.equipment.list(get_details=True)
 
         assert len(equipment) == 2
 
@@ -108,7 +108,7 @@ class TestEquipment:
 
     @pytest.mark.vcr
     def test_get_equipment_details(self, grocy: Grocy):
-        equipment = grocy.get_equipment(1)
+        equipment = grocy.equipment.get(1)
 
         assert isinstance(equipment, Equipment)
         assert equipment.id == 1
@@ -122,7 +122,7 @@ class TestEquipment:
     @pytest.mark.vcr
     def test_get_equipment_details_non_existent(self, grocy: Grocy):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.get_equipment(999)
+            grocy.equipment.get(999)
 
         error = exc_info.value
         assert error.status_code == 404
@@ -130,7 +130,7 @@ class TestEquipment:
     @pytest.mark.vcr
     def test_get_equipment_filters_valid(self, grocy: Grocy):
         query_filter = ["name=Coffee machine"]
-        equipment = grocy.equipment(query_filters=query_filter)
+        equipment = grocy.equipment.list(query_filters=query_filter)
 
         assert len(equipment) == 1
         assert equipment[0].name == "Coffee machine"
@@ -138,7 +138,7 @@ class TestEquipment:
     @pytest.mark.vcr
     def test_get_equipment_filters_invalid(self, grocy: Grocy, invalid_query_filter):
         with pytest.raises(GrocyError) as exc_info:
-            grocy.equipment(query_filters=invalid_query_filter)
+            grocy.equipment.list(query_filters=invalid_query_filter)
 
         error = exc_info.value
         assert error.status_code == 500
